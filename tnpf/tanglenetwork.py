@@ -30,7 +30,12 @@ def worker(arg):
     pfs, ii ,sigma = arg
     gmm = get_gmm_from_pf(pfs[ii],sigma)
     for jj in range(len(pfs)):
-        w.append(gmm.pdf(pfs[jj].X))
+        if ii == jj:
+            w.append(pfs[ii].W)
+        else:
+            w_temp = gmm.pdf(pfs[jj].X)
+            w_temp = w_temp/w_temp.sum()
+            w.append(w_temp)
     return w
     
     

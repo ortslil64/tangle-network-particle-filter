@@ -9,16 +9,16 @@ import matplotlib.pyplot as plt
 # ---- parameters ---- #
 Nz = 10
 Q = 0.5
-R = np.random.uniform(1.1,1.11, size=Nz)
-dt = 0.1 
+R = np.random.uniform(0.1,1.11, size=Nz)
+dt = 0.5 
 Ns = 70
 P0 = 0.1
 X0 = 0
 Np = 100
 Np_c = 500
-sigma = 0.0001
+sigma = 0.01
 n_components = 10
-fusion_rate = 3
+fusion_rate = 10
 n_workers = 18
 A = np.eye(Nz) + 0.1*np.ones((Nz,Nz))
 A = A / A.sum(axis = 1)[:,None]
@@ -40,7 +40,7 @@ for ii in range(sim.Nz):
     
 cpf = centrlized_particle_filter(X0 = sim.X0, P0 = sim.P0, R = R, Q=sim.Q , Np = Np_c)
 # ---- Initialize tangle network ---- #
-tn = tangle_network(Na = sim.Nz, sigma = sigma, A = A)
+tn = tangle_network(Na = sim.Nz, sigma = sigma)
 
 # ---- Initialize distributed particle filters network network ---- #
 dn = DPF(Na = sim.Nz, n_components = n_components)
