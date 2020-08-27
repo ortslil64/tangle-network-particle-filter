@@ -15,7 +15,7 @@ class GMM():
     def pdf(self, x):
         f = np.zeros_like(x)
         for ii in range(self.components):
-            f = f + self.Weights[ii]*norm(loc = self.Mus[ii], scale = self.Sigmas[ii]).pdf(x)
+            f = f + self.Weights[ii]*norm(loc = self.Mus[ii], scale = np.sqrt(self.Sigmas[ii])).pdf(x)
         return f
 
 def get_gmm_from_pf(pf, sigma):
@@ -23,6 +23,7 @@ def get_gmm_from_pf(pf, sigma):
     Weights = pf.W
     Sigmas = np.ones_like(Weights) * sigma
     return GMM(Mus, Sigmas, Weights)
+
 
 def worker(arg):
     w = []
@@ -54,20 +55,17 @@ class tangle_network():
                 self.A[ii,jj] = w[jj]/w[ii]
         self.A = self.A / self.A.sum(axis = 1)[:,None]
                 
-    def fuse_particle_filters(self, pfs):
+    def fuse_particle_filters(self, pfs, n_workers = None):
         t0 = time.time()
         pfs_weights = np.empty((self.Na,self.Na), dtype=object)
-        
-        pool = mp.Pool(mp.cpu_count())
+        if n_workers is None:
+            pool = mp.Pool(mp.cpu_count())
+        else:
+            pool = mp.Pool(n_workers)
         pfs_weights = pool.map(worker, ((pfs, ii, self.sigma) for ii in range(self.Na)))
         pool.close()
         pool.join()
         
-        
-        # for ii in range(self.Na):
-        #     gmm = get_gmm_from_pf(pfs[ii],self.sigma)
-        #     for jj in range(self.Na):
-        #         pfs_weights[ii,jj] = gmm.pdf(pfs[jj].X)
                 
         for ii in range(self.Na):
             w = np.array([x for x in pfs_weights[:][ii]], dtype=np.float64)

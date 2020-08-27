@@ -7,7 +7,7 @@ from particlefilter import particle_filter
 class simulation():
     def __init__(self, Q, R, dt, Ns, P0, X0):
         self.X = np.zeros(Ns)
-        self.X[0] = np.random.normal(X0, P0)
+        self.X[0] = np.random.normal(X0, np.sqrt(P0))
         self.Q = Q
         self.R = np.diag(R)
         self.dt = dt
@@ -20,11 +20,11 @@ class simulation():
     def reset(self):
         self.t = 0
         self.X = np.zeros(self.Ns)
-        self.X[0] = np.random.normal(self.X0, self.P0)
+        self.X[0] = np.random.normal(self.X0, np.sqrt(self.P0))
         
     def step(self):
         if self.t < self.Ns - 1:
-            self.X[self.t+1] = np.random.normal(np.sin(self.dt*self.X[self.t]), self.Q)
+            self.X[self.t+1] = np.random.normal(np.sin(self.dt*self.X[self.t]), np.sqrt(self.Q))
             self.z = np.random.multivariate_normal(np.ones(self.Nz)*self.X[self.t+1], self.R)
             self.t +=1
         return self.X[self.t], self.z
