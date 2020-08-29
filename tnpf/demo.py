@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-from  simulator import simulation
+from  simulator import simulation_sin
 from particlefilter import particle_filter, centrlized_particle_filter
 from tanglenetwork import tangle_network
 from distributed_particle_filtering import DPF
@@ -8,22 +8,22 @@ import matplotlib.pyplot as plt
 
 # ---- parameters ---- #
 Nz = 10
-Q = 0.5
-R = np.random.uniform(0.1,1.11, size=Nz)
+Q = 0.7
+R = np.random.uniform(1.1,1.11, size=Nz)
 dt = 0.5 
 Ns = 70
 P0 = 0.1
 X0 = 0
-Np = 100
-Np_c = 500
+Np = 200
+Np_c = 5000
 sigma = 0.01
 n_components = 10
 fusion_rate = 10
-n_workers = 18
+n_workers = None
 A = np.eye(Nz) + 0.1*np.ones((Nz,Nz))
 A = A / A.sum(axis = 1)[:,None]
 # ---- Initialize simulator ---- #
-sim = simulation(Q, R, dt, Ns, P0, X0)
+sim = simulation_sin(Q, R, dt, Ns, P0, X0)
 
 # ---- Initialize particle filters ---- #
 tn_pfs = []

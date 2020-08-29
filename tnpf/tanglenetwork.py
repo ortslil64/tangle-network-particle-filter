@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import norm, multivariate_normal
 import time
 import multiprocessing as mp
 
@@ -13,15 +13,15 @@ class GMM():
         self.Weights = Weights
         self.components = len(Mus)
     def pdf(self, x):
-        f = np.zeros_like(x)
+        f = np.zeros(len(x))
         for ii in range(self.components):
-            f = f + self.Weights[ii]*norm(loc = self.Mus[ii], scale = np.sqrt(self.Sigmas[ii])).pdf(x)
+            f = f + self.Weights[ii]*multivariate_normal(mean = self.Mus[ii,:], cov = self.Sigmas[ii]).pdf(x)
         return f
 
 def get_gmm_from_pf(pf, sigma):
     Mus = pf.X
     Weights = pf.W
-    Sigmas = np.ones_like(Weights) * sigma
+    Sigmas = [np.eye(len(pf.Q)) * sigma]*len(pf.W)
     return GMM(Mus, Sigmas, Weights)
 
 
@@ -34,7 +34,7 @@ def worker(arg):
             w.append(pfs[ii].W)
         else:
             w_temp = gmm.pdf(pfs[jj].X)
-            w_temp = w_temp/w_temp.sum()
+            #w_temp = w_temp/w_temp.sum()
             w.append(w_temp)
     return w
     
@@ -82,6 +82,7 @@ class tangle_network():
             else:
                 w = w/np.sum(w)
             pfs[ii].W = w
+            pfs[ii].resample
         dt = time.time() - t0
         return pfs, dt
     
