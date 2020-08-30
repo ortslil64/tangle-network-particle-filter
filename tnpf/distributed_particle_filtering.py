@@ -6,22 +6,11 @@ import multiprocessing as mp
 from sklearn import mixture
 
 
-class GMM():
-    def __init__(self, Mus, Sigmas, Weights):
-        self.Mus = Mus
-        self.Sigmas = Sigmas
-        self.Weights = Weights
-        self.components = len(Mus)
-    def pdf(self, x):
-        f = np.zeros_like(x)
-        for ii in range(self.components):
-            f = f + self.Weights[ii]*norm(loc = self.Mus[ii], scale = self.Sigmas[ii]).pdf(x)
-        return f
 
 def get_gmm_from_pf(pf, n_components):
     s = np.random.choice(pf.Np, pf.Np, p = pf.W)
     X = pf.X[s]
-    gmm = mixture.GaussianMixture(n_components=n_components, covariance_type='full').fit(X.reshape(-1, 1))
+    gmm = mixture.GaussianMixture(n_components=n_components, covariance_type='full').fit(X)
     return gmm
 
 def gmm_worker(arg):
@@ -32,7 +21,7 @@ def gmm_worker(arg):
 def get_fuzed_prob(x, gmms, A):
     f = 1
     for ii in range(len(gmms)):
-        f = f * (np.exp(gmms[ii].score(np.array(x).reshape(-1, 1)))**A[ii])
+        f = f * (np.exp(gmms[ii].score(x.reshape(1, -1)))**A[ii])
     return f
 
 def matropolis_hasting(pf, gmms, A):

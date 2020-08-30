@@ -86,4 +86,56 @@ class tangle_network():
         dt = time.time() - t0
         return pfs, dt
     
+ 
+    
+
+def log_fuzer_worker(arg):
+    pfs, ii, A = arg
+    Np = pfs[ii].Np
+    x_temp = []
+    for jj in range(len(A)):
+        alpha = A[ii,jj]
+        w = pfs[jj].W 
+        s = np.random.choice(pfs[jj].Np, int(np.ceil(alpha*Np)), p=w)
+        x_temp.append(pfs[jj].X[s])
+    pfs[ii].X = np.concatenate(x_temp, axis = 0)
+    pfs[ii].X = pfs[ii].X[:Np]
+    pfs[ii].W = np.ones_like(pfs[ii].W)/pfs[ii].Np
+    return pfs[ii]
+
+
+class log_tangle_network():
+    def __init__(self, Na, sigma, A = None):
+        self.Na = Na
+        self.sigma = sigma
+        if A is None:
+            A = np.random.rand(Na,Na)
+            A = A / A.sum(axis = 1)[:,None]
+            self.A = A
+        else:
+            self.A = A
+    
+    def get_fusion_params(self, pfs, z):
+        w = np.zeros(len(pfs))
+        for ii in range(len(pfs)):
+            w[ii] = (np.linalg.norm(pfs[ii].estimate() - z))
+        w = w/w.sum()
+        for ii in range(len(pfs)):
+            for jj in range(len(pfs)):
+                self.A[ii,jj] = w[jj]/w[ii]
+        self.A = self.A / self.A.sum(axis = 1)[:,None]
+                
+    def fuse_particle_filters(self, pfs, n_workers = None):
+        t0 = time.time()
+           
+        if n_workers is None:
+            pool = mp.Pool(mp.cpu_count())
+        else:
+            pool = mp.Pool(n_workers)
+        pfs = pool.map(log_fuzer_worker, ((pfs, ii, self.A) for ii in range(self.Na)))
+        pool.close()
+        pool.join()
+        dt = time.time() - t0
+        return pfs, dt
+    
         
