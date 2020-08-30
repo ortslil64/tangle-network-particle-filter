@@ -3,6 +3,7 @@ import numpy as np
 from scipy.stats import norm, multivariate_normal
 import time
 import multiprocessing as mp
+from sklearn.neighbors import NearestNeighbors
 
 
 
@@ -87,6 +88,12 @@ class tangle_network():
         return pfs, dt
     
  
+def sensors_pose2fusion_mat(poses, k_groups):
+    nbrs = NearestNeighbors(n_neighbors=k_groups, algorithm='ball_tree').fit(poses)
+    A = nbrs.kneighbors_graph(poses).toarray()
+    A = A / A.sum(axis = 1)[:,None]
+    return A
+    
     
 
 def log_fuzer_worker(arg):

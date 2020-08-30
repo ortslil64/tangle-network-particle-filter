@@ -61,6 +61,8 @@ class simulation_fly():
             self.t +=1
         return self.X[self.t], self.z
     
+
+    
         
         
 if __name__ == '__main__':

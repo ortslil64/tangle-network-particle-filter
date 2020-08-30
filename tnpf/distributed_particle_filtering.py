@@ -47,6 +47,13 @@ def matropolis_hasting(pf, gmms, A):
         else:
             new_particles[jj] = x
     return new_particles
+
+
+def matropolis_hasting_worker(arg):
+    pfs, ii, gmms, A = arg
+    pfs[ii].X = matropolis_hasting(pfs[ii], gmms, A[ii])
+    pfs[ii].W = np.ones_like(pfs[ii].W)/pfs[ii].Np
+    return pfs[ii]
     
 class DPF():
     def __init__(self, Na, n_components, A = None):
@@ -80,9 +87,15 @@ class DPF():
         pool.close()
         pool.join()
         
-        for ii in range(self.Na):
-            pfs[ii].X = matropolis_hasting(pfs[ii], gmms, self.A)
-            pfs[ii].W = np.ones_like(pfs[ii].W)/pfs[ii].Np  
+        if n_workers is None:
+            pool = mp.Pool(mp.cpu_count())
+        else:
+            pool = mp.Pool(n_workers)
+        pfs = pool.map(matropolis_hasting_worker, ((pfs, ii, gmms, self.A) for ii in range(self.Na)))
+        pool.close()
+        pool.join()
+        
+  
 
                 
         dt = time.time() - t0

@@ -79,6 +79,51 @@ class particle_filter_fly():
         return self.X.T.dot(self.W)
     
     
+
+
+class centrlized_particle_filter_fly():
+    def __init__(self, X0, P0, R ,Q , pose, v, omega, Np = 100, verbos = False):
+        self.verbos = verbos
+        self.Np = Np
+        self.R = R
+        self.Q = Q
+        self.P = P0
+        self.pose = pose
+        self.v = v
+        self.omega = omega
+        self.W = np.ones(Np)/Np
+        self.X = np.random.multivariate_normal(X0, P0, Np)
+        
+    def predict(self, dt):
+        self.X = process_model_fly(self.X, dt, self.Q, self.v, self.omega)
+    
+    def resample(self):
+        idxs = np.random.choice(a = self.Np,size = self.Np, p = self.W)
+        self.X = self.X[idxs]
+        self.W = np.ones(self.Np)/self.Np
+        
+    def update(self, z):
+        f = np.ones_like(self.W)
+        for ii in range(len(z)):
+            f = f * likelihood_model_fly(self.X, self.pose[ii], [z[ii]], [self.R[ii]])
+        self.W = self.W * f
+        if np.sum(self.W) == 0:
+            self.W = np.ones(self.Np)/self.Np
+        else:
+            self.W = self.W/np.sum(self.W)
+        
+        Neff = 1/(np.sum(np.power(self.W, 2)))
+        if Neff < (2/3)*self.Np:
+            if self.verbos:
+                print("Performing resample...")
+            self.resample()
+            if self.verbos:
+                print("Done resample!")
+    
+    def estimate(self):
+        return self.X.T.dot(self.W)
+    
+    
     
 class centrlized_particle_filter():
     def __init__(self, X0, P0, R,Q , Np = 100, verbos = False):
