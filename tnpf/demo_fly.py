@@ -43,7 +43,7 @@ for iteration in range(len(Nzs)):
     A = A / A.sum(axis = 1)[:,None]
     n_components = 2
     fusion_rate = 3
-    n_workers = 16
+    n_workers = 24
     plot_flag = True
     
     # ---- Initialize simulator ---- #
@@ -221,15 +221,15 @@ for iteration in range(len(Nzs)):
             dn_time_temp.append(DN_time[qq].mean())
             tn_time_temp.append(TN_time[qq].mean())
         plt.subplot(1,2,1)
-        plt.plot(tn_mse_temp, c = 'blue', linewidth=1)
-        plt.plot(dn_mse_temp, c = 'red', linewidth=1)
-        plt.plot(nn_mse_temp, c = 'gray', linewidth=1)
-        plt.plot(cn_mse_temp, c = 'black', linewidth=1)
+        plt.plot(Nzs[:iteration],tn_mse_temp, c = 'blue', linewidth=1)
+        plt.plot(Nzs[:iteration],dn_mse_temp, c = 'red', linewidth=1)
+        plt.plot(Nzs[:iteration],nn_mse_temp, c = 'gray', linewidth=1)
+        plt.plot(Nzs[:iteration],cn_mse_temp, c = 'black', linewidth=1)
         plt.xlabel('t')
         plt.ylabel('MSE')
         plt.subplot(1,2,2)
-        plt.plot(tn_time_temp, c = 'blue', linewidth=1)
-        plt.plot(dn_time_temp, c = 'red', linewidth=1)
+        plt.plot(Nzs[:iteration],tn_time_temp, c = 'blue', linewidth=1)
+        plt.plot(Nzs[:iteration],dn_time_temp, c = 'red', linewidth=1)
         plt.xlabel('t')
         plt.ylabel('fusion time')
         plt.show()
