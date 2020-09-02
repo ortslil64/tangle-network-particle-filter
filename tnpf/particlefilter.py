@@ -53,7 +53,7 @@ class particle_filter_fly():
         self.X = np.random.multivariate_normal(X0, P0, Np)
         
     def predict(self, dt):
-        self.X = process_model_fly(self.X, dt, self.Q, self.v, self.omega)
+        self.X = process_model_fly(self.X, dt, 1.5*self.Q, self.v, self.omega)
     
     def resample(self):
         idxs = np.random.choice(a = self.Np,size = self.Np, p = self.W)
@@ -95,7 +95,7 @@ class centrlized_particle_filter_fly():
         self.X = np.random.multivariate_normal(X0, P0, Np)
         
     def predict(self, dt):
-        self.X = process_model_fly(self.X, dt, self.Q, self.v, self.omega)
+        self.X = process_model_fly(self.X, dt, 1.5*self.Q, self.v, self.omega)
     
     def resample(self):
         idxs = np.random.choice(a = self.Np,size = self.Np, p = self.W)
