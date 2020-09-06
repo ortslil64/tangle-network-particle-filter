@@ -59,3 +59,15 @@ plt.plot(sim_fly.X[:,0], sim_fly.X[:,1], c='red', linewidth = 1.5)
 plt.xlabel('x', fontsize=18)
 plt.ylabel('y', fontsize=18)
 plt.show()
+
+# ---- plot connectivity ---- #
+fig, (ax1,ax2) = plt.subplots(figsize=(5,10), nrows=2)
+A = np.random.rand(Nz,Nz)
+A = A / A.sum(axis = 1)[:,None]
+pos = ax1.imshow(A, cmap=plt.cm.Greys)
+fig.colorbar(pos, ax=ax1)
+
+ax2.scatter(poses[:,0], poses[:,1])
+plt.xlabel('x', fontsize=18)
+plt.ylabel('y', fontsize=18)
+plt.show()

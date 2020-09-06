@@ -1,4 +1,4 @@
-load('data.mat')
+load('data/data.mat')
 figure(1);
 hold on;
 plot(Nzs(1:10), nn_mse_over_n(1:10),'color','green','LineWidth',1.1);
@@ -10,6 +10,7 @@ plot(Nzs(1:6), dn_mse_over_n(1:6),'color','red', 'LineWidth',1.1);
 xlim([5,300]);
 xlabel('nodes');
 ylabel('MSE');
+set(gca,'Yscale','log')
 
 figure(2);
 hold on;
@@ -18,6 +19,8 @@ plot(Nzs(1:10), tn_time_over_n(1:10),'color','blue','LineWidth',1.1);
 xlim([5,300]);
 xlabel('nodes');
 ylabel('time');
+
+
 
 figure(3);
 t = 1:99;
@@ -32,4 +35,13 @@ xlim([1,99]);
 ylim([0,3]);
 xlabel('k');
 ylabel('MSE');
-set(gca,'Yscale','linear')
+set(gca,'Yscale','log')
+
+
+Nz = 100;
+A = rand(Nz,Nz);
+A = normr(A).^2;
+imagesc(A);
+colorbar;
+set(gca, 'ydir', 'normal' )
+
