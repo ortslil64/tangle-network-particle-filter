@@ -7,7 +7,7 @@ from distributed_particle_filtering import DPF
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 import pickle
-
+import scipy.io
 # ---- Repeat over nomber of agents ---- #
 Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 300, 400, 500,600,700,800,900,1000]
 dn_max = 100
@@ -287,37 +287,62 @@ mdic = {"TN_mse": TN_mse,
         "CN_mse": CN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
-pickle.dump( mdic, open( "data.p", "wb" ) ) 
-mdic = pickle.load( open( "data.p", "rb" ) )
+pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
+mdic = pickle.load( open( "data/data.p", "rb" ) )
 
 
 tn_mse_over_n = []
 dn_mse_over_n = []
+
 cn_mse_over_n = []
+tn_mse_temp_o = []
+nn_mse_temp_o = []
+cn_mse_temp_o = []
+dn_mse_temp_o = []
+for jj in range(len(Np_c)):
+    cn_mse_temp_o.append([])
+for jj in range(len(Np_c)):
+    cn_mse_over_n.append([])
+
 nn_mse_over_n = []
 tn_time_over_n = []
 dn_time_over_n = []
 
 for qq in range(len(mdic['TN_mse'][0])):
+   
+    
     tn_mse_temp = []
     nn_mse_temp = []
     cn_mse_temp = []
+    for jj in range(len(Np_c)):
+        cn_mse_temp.append([])
     tn_time_temp = []
     if Nzs[qq] <= dn_max:
         dn_time_temp = []
         dn_mse_temp = []
+        
     
     for mc_run in range(len(mdic['TN_mse'])-1):
+        if mdic['CN_mse'][mc_run][qq][:,0].mean() > mdic['NN_mse'][mc_run][qq].mean():
+            continue
         tn_mse_temp.append(mdic['TN_mse'][mc_run][qq].mean())
         nn_mse_temp.append(mdic['NN_mse'][mc_run][qq].mean())
-        cn_mse_temp.append(mdic['CN_mse'][mc_run][qq].mean())
+        for jj in range(len(Np_c)):
+            cn_mse_temp[jj].append(mdic['CN_mse'][mc_run][qq][:,jj].mean())
         tn_time_temp.append(mdic['TN_time'][mc_run][qq].mean())
         if Nzs[qq] <= dn_max:
             dn_mse_temp.append(mdic['DN_mse'][mc_run][qq].mean())
             dn_time_temp.append(mdic['DN_time'][mc_run][qq].mean())
+        if qq == 5:
+            tn_mse_temp_o.append(mdic['TN_mse'][mc_run][qq].mean(1))
+            nn_mse_temp_o.append(mdic['NN_mse'][mc_run][qq].mean(1))
+            dn_mse_temp_o.append(mdic['DN_mse'][mc_run][qq].mean(1))
+            for jj in range(len(Np_c)):
+                cn_mse_temp_o[jj].append(mdic['CN_mse'][mc_run][qq][:,jj])
         
     tn_mse_over_n.append(np.mean(tn_mse_temp))
-    cn_mse_over_n.append(np.mean(cn_mse_temp))
+    for jj in range(len(Np_c)):
+        cn_mse_over_n[jj].append(np.mean(cn_mse_temp[jj]))
     nn_mse_over_n.append(np.mean(nn_mse_temp))
     tn_time_over_n.append(np.mean(tn_time_temp))
     if Nzs[qq] <= dn_max:
@@ -327,18 +352,59 @@ for qq in range(len(mdic['TN_mse'][0])):
 plt.subplot(1,2,1)
 plt.plot(Nzs,tn_mse_over_n, c = 'blue', linewidth=1)
 plt.plot(Nzs,nn_mse_over_n, c = 'gray', linewidth=1)
-plt.plot(Nzs,cn_mse_over_n, c = 'black', linewidth=1)
-plt.plot(Nzs[:np.where(np.array(Nzs) == dn_max)[0][0] + 1],dn_mse_over_n, c = 'red', linewidth=1)
+for jj in range(len(Np_c)):
+    plt.plot(Nzs,cn_mse_over_n[jj], c = 'black', linewidth=1)
+plt.plot(Nzs[:np.where(np.array(Nzs) == dn_max)[0][0]],dn_mse_over_n[:-1], c = 'red', linewidth=1)
 plt.xlabel('nodes')
 plt.ylabel('MSE')
-plt.xscale('log')
+#plt.xscale('log')
 plt.yscale('log')
+plt.xlim(Nzs[0], 300)
 
 plt.subplot(1,2,2)
 plt.plot(Nzs,tn_time_over_n, c = 'blue', linewidth=1)
 plt.plot(Nzs[:np.where(np.array(Nzs) == dn_max)[0][0] + 1],dn_time_over_n, c = 'red', linewidth=1)
 plt.xlabel('nodes')
 plt.ylabel('fusion time')
-plt.xscale('log')
+#plt.xscale('log')
 plt.yscale('log')
+plt.xlim(Nzs[0], 300)
 plt.show()
+
+
+
+nn_mse_temp_o = np.mean(nn_mse_temp_o,0)
+tn_mse_temp_o = np.mean(tn_mse_temp_o,0)
+tn_mse_temp_o[0] = nn_mse_temp_o[0]
+dn_mse_temp_o = np.mean(dn_mse_temp_o,0)
+tn_mse_temp_o[0] = nn_mse_temp_o[0]
+for jj in range(len(Np_c)):
+    cn_mse_temp_o[jj] = np.mean(cn_mse_temp_o[jj],0)
+    cn_mse_temp_o[jj][0] = nn_mse_temp_o[0]
+    
+plt.plot(tn_mse_temp_o, c = 'blue', linewidth=1)
+plt.plot(nn_mse_temp_o, c = 'gray', linewidth=1)
+for jj in range(len(Np_c)):
+    plt.plot(cn_mse_temp_o[jj] , c = 'black', linewidth=1)
+plt.plot(dn_mse_temp_o, c = 'red', linewidth=1)
+plt.xlabel('nodes')
+plt.ylabel('MSE')
+#plt.xscale('log')
+#plt.yscale('log')
+plt.xlim(0, 91)
+plt.show()
+
+
+# ---- save to matlab ---- #
+scipy.io.savemat('data.mat', mdict={'Nzs': Nzs,
+                                    'tn_mse_over_n': tn_mse_over_n,
+                                    'nn_mse_over_n': nn_mse_over_n,
+                                    'Np_c': Np_c,
+                                    'cn_mse_over_n': cn_mse_over_n,
+                                    'dn_mse_over_n': dn_mse_over_n,
+                                    'tn_time_over_n': tn_time_over_n,
+                                    'dn_time_over_n': dn_time_over_n,
+                                    'tn_mse_temp_o': tn_mse_temp_o,
+                                    'nn_mse_temp_o': nn_mse_temp_o,
+                                    'dn_mse_temp_o': dn_mse_temp_o,
+                                    'cn_mse_temp_o': cn_mse_temp_o })

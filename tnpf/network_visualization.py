@@ -22,7 +22,7 @@ Np = 100
 Np_c = [100, 300, 5000]
 sigma = 0.01
 omega = 0.4
-Nz = Nzs[5]
+Nz = Nzs[3]
 # ---- Initialize simulator ---- #
 sim_fly = simulation_fly(Q = Q,
                              R = R[:Nz],
@@ -45,14 +45,14 @@ for ii in range(Nz):
 for ii in range(Nz):
     for jj in range(Nz):
         if A[ii,jj] > 1/Nz and ii != jj:
-            graph.add_edge(ii,jj, weight=10*A[ii,jj] )
+            graph.add_edge(ii,jj, weight=20*A[ii,jj] )
 edges = graph.edges()
 weights = [graph[u][v]['weight'] for u,v in edges]
-colors = [graph[u][v]['weight'] for u,v in edges]
-colors = (np.array(colors) - max(colors))/(max(colors) - min(colors))
+colors = [(100*graph[u][v]['weight']) for u,v in edges]
+colors = (np.array(colors) - min(colors))/(max(colors) - min(colors))
 pos=nx.get_node_attributes(graph,'pos')
 fig, ax = plt.subplots(figsize=(10,10))
-nx.draw(graph,pos, node_size = 5, width=weights, edge_color=colors, edge_cmap=plt.cm.seismic, ax=ax)
+nx.draw(graph,pos, node_size = 5,  edge_color=colors, edge_cmap=plt.cm.YlGnBu, ax=ax, node_color='red')
 limits=plt.axis('on')
 ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
 plt.scatter(sim_fly.X[:,0], sim_fly.X[:,1], c='black', s = 0.5)
