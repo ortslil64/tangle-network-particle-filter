@@ -16,6 +16,9 @@ mc_runs = 100
 TN_mse = []
 DN_mse = []
 NN_mse = []
+TN_var = []
+DN_var = []
+NN_var = []
 CN_mse = []
 TN_time = []
 DN_time = []
@@ -32,6 +35,9 @@ for mc_run in range(mc_runs):
     TN_mse.append([])
     DN_mse.append([])
     NN_mse.append([])
+    TN_var.append([])
+    DN_var.append([])
+    NN_var.append([])
     CN_mse.append([])
     TN_time.append([])
     DN_time.append([])
@@ -138,6 +144,9 @@ for mc_run in range(mc_runs):
         tn_mse = np.zeros((Ns, Nz))
         dn_mse = np.zeros((Ns, Nz))
         nn_mse = np.zeros((Ns, Nz))
+        tn_var = np.zeros(Ns)
+        dn_var = np.zeros(Ns)
+        nn_var = np.zeros(Ns)
         cn_mse = np.zeros((Ns, len(Np_c)))
         tn_time = np.zeros(Ns)
         dn_time = np.zeros(Ns)
@@ -205,7 +214,10 @@ for mc_run in range(mc_runs):
                 if Nz <= dn_max:
                     dn_mse[t,ii] = np.linalg.norm(dn_pfs[ii].estimate()[:2] - x[:2])**2
                     dn_x[t,ii,:] = dn_pfs[ii].estimate() 
-               
+            tn_var[t] = np.trace(np.cov(tn_x[t,:,0:2].T))
+            nn_var[t] = np.trace(np.cov(nn_x[t,:,0:2].T))
+            if Nz <= dn_max:
+               dn_var[t] = np.trace(np.cov(dn_x[t,:,0:2].T))
             # ---- Fusion every 'fusion_rate' time steps ---- #    
             if t % fusion_rate == 0:
                 #tn.get_fusion_params(tn_pfs, z)
@@ -228,11 +240,14 @@ for mc_run in range(mc_runs):
             print("MSE: CN:"+str(cn_mse.mean()))
         if Nz <= dn_max:
             DN_mse[mc_run].append(dn_mse)
+            DN_var[mc_run].append(dn_var)
             DN_time[mc_run].append(dn_time)
         CN_mse[mc_run].append(cn_mse)
         NN_mse[mc_run].append(nn_mse)
+        NN_var[mc_run].append(nn_var)
         TN_time[mc_run].append(tn_time)
-        TN_mse[mc_run].append(tn_mse)   
+        TN_mse[mc_run].append(tn_mse)  
+        TN_var[mc_run].append(tn_var)
         
         if plot_flag == True:
             tn_mse_temp = []
@@ -284,27 +299,35 @@ for mc_run in range(mc_runs):
 mdic = {"TN_mse": TN_mse,
         "DN_mse": DN_mse,
         "NN_mse": NN_mse,
+        "TN_var": TN_var,
+        "DN_var": DN_var,
+        "NN_var": NN_var,
         "CN_mse": CN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
 pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
-mdic = pickle.load( open( "data/data.p", "rb" ) )
+mdic = pickle.load( open( "data/data_uniform.p", "rb" ) )
 
 
 tn_mse_over_n = []
 dn_mse_over_n = []
-
+tn_var_over_n = []
+dn_var_over_n = []
 cn_mse_over_n = []
+cn_var_over_n = []
+
 tn_mse_temp_o = []
 nn_mse_temp_o = []
 cn_mse_temp_o = []
 dn_mse_temp_o = []
+    
 for jj in range(len(Np_c)):
     cn_mse_temp_o.append([])
-for jj in range(len(Np_c)):
     cn_mse_over_n.append([])
+    cn_varover_n.append([])
 
 nn_mse_over_n = []
+nn_var_over_n = []
 tn_time_over_n = []
 dn_time_over_n = []
 
@@ -314,8 +337,12 @@ for qq in range(len(mdic['TN_mse'][0])):
     tn_mse_temp = []
     nn_mse_temp = []
     cn_mse_temp = []
+    tn_var_temp = []
+    nn_var_temp = []
+    cn_var_temp = []
     for jj in range(len(Np_c)):
         cn_mse_temp.append([])
+        cn_var_temp.append([])
     tn_time_temp = []
     if Nzs[qq] <= dn_max:
         dn_time_temp = []
