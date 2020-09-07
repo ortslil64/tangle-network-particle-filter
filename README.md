@@ -26,3 +26,11 @@ git clone https://github.com/ortslil64/tangle-network-particle-filter.git
 ```bash
 pip install -e tangle-network-particle-filter
 
+## Usage
+Run the demo file:
+```bash
+python3 demo/demo.py  
+```
+
+## API tutorial
+TO DO
