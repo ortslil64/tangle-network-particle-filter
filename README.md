@@ -25,6 +25,7 @@ git clone https://github.com/ortslil64/tangle-network-particle-filter.git
 3) Install the package using pip:
 ```bash
 pip install -e tangle-network-particle-filter
+```
 
 ## Usage
 Run the demo file:
