@@ -3,6 +3,7 @@ import numpy as np
 from  simulator import simulation_fly
 import matplotlib.pyplot as plt
 import networkx as nx
+import scipy.io
 
 # ---- parameters ---- #
 Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 300, 400, 500,600,700,800,900,1000]
@@ -19,10 +20,9 @@ P0 = np.diag([0.05,0.05,0.01])
 v = 1
 X0 = np.array([0,0,0])
 Np = 100
-Np_c = [100, 300, 5000]
 sigma = 0.01
 omega = 0.3
-Nz = Nzs[3]
+Nz = Nzs[4]
 # ---- Initialize simulator ---- #
 sim_fly = simulation_fly(Q = Q,
                              R = R[:Nz],
@@ -71,3 +71,10 @@ ax2.scatter(poses[:,0], poses[:,1])
 plt.xlabel('x', fontsize=18)
 plt.ylabel('y', fontsize=18)
 plt.show()
+
+# ---- Save data ---- #
+scipy.io.savemat('data/network_data.mat', mdict={'Nz': Nz,
+                                    'node_pose': sim_fly.poses,
+                                    'A': A,
+                                    'target_path': sim_fly.X})
+

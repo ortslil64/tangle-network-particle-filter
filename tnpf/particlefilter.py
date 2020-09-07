@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.stats import multivariate_normal, norm
-from models import process_model_sin, likelihood_model_sin, process_model_fly, likelihood_model_fly
+from tnpf.models import process_model_sin, likelihood_model_sin, process_model_fly, likelihood_model_fly
 
 class particle_filter_sin():
     def __init__(self, X0, P0, R ,Q , Np = 100, verbos = False):

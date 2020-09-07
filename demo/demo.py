@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
-from  simulator import simulation_fly
-from particlefilter import particle_filter_fly, centrlized_particle_filter_fly
-from tanglenetwork import  log_tangle_network, sensors_pose2fusion_mat
-from distributed_particle_filtering import DPF
+from tnpf.simulator import simulation_fly
+from tnpf.particlefilter import particle_filter_fly, centrlized_particle_filter_fly
+from tnpf.tanglenetwork import  log_tangle_network, sensors_pose2fusion_mat
+from tnpf.distributed_particle_filtering import DPF
 import multiprocessing as mp
 import matplotlib.pyplot as plt
 import pickle
