@@ -10,7 +10,7 @@ from sklearn import mixture
 def get_gmm_from_pf(pf, n_components):
     s = np.random.choice(pf.Np, pf.Np, p = pf.W)
     X = pf.X[s]
-    gmm = mixture.GaussianMixture(n_components=n_components, covariance_type='full', max_iter=30).fit(X)
+    gmm = mixture.GaussianMixture(n_components=n_components, covariance_type='diag', max_iter=10, tol = 3e-3).fit(X)
     return gmm
 
 def gmm_worker(arg):

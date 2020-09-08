@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-from particlefilter import particle_filter_sin, particle_filter_fly
-from models import process_model_sin, mesurment_model_sin, process_model_fly, mesurment_model_fly
+from tnpf.particlefilter import particle_filter_sin, particle_filter_fly
+from tnpf.models import process_model_sin, mesurment_model_sin, process_model_fly, mesurment_model_fly
 
 class simulation_sin():
     def __init__(self, Q, R, dt, Ns, P0, X0):

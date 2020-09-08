@@ -88,9 +88,12 @@ class tangle_network():
         return pfs, dt
     
  
-def sensors_pose2fusion_mat(poses, k_groups):
+def sensors_pose2fusion_mat(poses, k_groups, target_pose):
     nbrs = NearestNeighbors(n_neighbors=k_groups, algorithm='ball_tree').fit(poses)
+    _, nbrs_close_target = nbrs.kneighbors(target_pose)
     A = nbrs.kneighbors_graph(poses).toarray()
+    for nbr in nbrs_close_target:
+        A[:,nbr] = A[:,nbr] * 2
     A = A / A.sum(axis = 1)[:,None]
     return A
     
