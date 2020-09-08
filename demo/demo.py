@@ -45,16 +45,16 @@ for mc_run in range(mc_runs):
     
         # ---- parameters ---- #
         Nz = Nzs[iteration]
-        Q = np.diag([0.2,0.2,0.03])
-        dt = 0.1 
-        Ns = 100
-        P0 = np.diag([1.5,1.5,0.01])
+        Q = np.diag([0.02,0.02,0.003])
+        dt = 0.5 
+        Ns = 30
+        P0 = np.diag([0.5,0.5,0.01])
         v = 1
         X0 = np.array([0,0,0])
-        Np = 100
-        Np_c = [100, 300, 5000]
+        Np = 200
+        Np_c = [200, 500, 5000]
         sigma = 0.01
-        omega = 0.8
+        omega = 0.4
         
         # A = np.eye(Nz)
         # for ii in range(Nz):
@@ -252,24 +252,30 @@ for mc_run in range(mc_runs):
         if plot_flag == True:
             tn_mse_temp = []
             nn_mse_temp = []
+            tn_var_temp = []
+            nn_var_temp = []
             cn_mse_temp = []
             tn_time_temp = []
             if Nz <= dn_max:
                 dn_time_temp = []
                 dn_mse_temp = []
+                dn_var_temp = []
             
             for qq in range(len(TN_mse[mc_run])):
                 tn_mse_temp.append(TN_mse[mc_run][qq].mean())
+                tn_var_temp.append(TN_var[mc_run][qq].mean())
                 nn_mse_temp.append(NN_mse[mc_run][qq].mean())
+                nn_var_temp.append(NN_var[mc_run][qq].mean())
                 cn_mse_temp.append([])
                 for jj in range(len(Np_c)):
                     cn_mse_temp[qq].append(CN_mse[mc_run][qq][:,jj].mean())
                 tn_time_temp.append(TN_time[mc_run][qq].mean())
                 if Nz <= dn_max:
                     dn_mse_temp.append(DN_mse[mc_run][qq].mean())
+                    dn_var_temp.append(DN_var[mc_run][qq].mean())
                     dn_time_temp.append(DN_time[mc_run][qq].mean())
                     
-            plt.subplot(1,2,1)
+            plt.subplot(1,3,1)
             if iteration == 0:
                 idx = 1
             else:
@@ -284,7 +290,16 @@ for mc_run in range(mc_runs):
             plt.ylabel('MSE')
             plt.xscale('log')
             plt.yscale('log')
-            plt.subplot(1,2,2)
+            plt.subplot(1,3,2)
+            
+            plt.plot(Nzs[:idx],tn_var_temp, c = 'blue', linewidth=1)
+            plt.plot(Nzs[:idx],nn_var_temp, c = 'gray', linewidth=1)
+            if Nz <= dn_max:
+                plt.plot(Nzs[:idx],dn_var_temp, c = 'red', linewidth=1)
+            plt.xlabel('nodes')
+            plt.ylabel('Var')
+
+            plt.subplot(1,3,3)
             plt.plot(Nzs[:idx],tn_time_temp, c = 'blue', linewidth=1)
             if Nz <= dn_max:
                 plt.plot(Nzs[:idx],dn_time_temp, c = 'red', linewidth=1)
@@ -314,7 +329,7 @@ dn_mse_over_n = []
 tn_var_over_n = []
 dn_var_over_n = []
 cn_mse_over_n = []
-cn_var_over_n = []
+dn_var_over_n = []
 
 tn_mse_temp_o = []
 nn_mse_temp_o = []
@@ -324,7 +339,6 @@ dn_mse_temp_o = []
 for jj in range(len(Np_c)):
     cn_mse_temp_o.append([])
     cn_mse_over_n.append([])
-    cn_varover_n.append([])
 
 nn_mse_over_n = []
 nn_var_over_n = []
@@ -339,10 +353,9 @@ for qq in range(len(mdic['TN_mse'][0])):
     cn_mse_temp = []
     tn_var_temp = []
     nn_var_temp = []
-    cn_var_temp = []
+    dn_var_temp = []
     for jj in range(len(Np_c)):
         cn_mse_temp.append([])
-        cn_var_temp.append([])
     tn_time_temp = []
     if Nzs[qq] <= dn_max:
         dn_time_temp = []
@@ -353,12 +366,15 @@ for qq in range(len(mdic['TN_mse'][0])):
         if mdic['CN_mse'][mc_run][qq][:,0].mean() > mdic['NN_mse'][mc_run][qq].mean():
             continue
         tn_mse_temp.append(mdic['TN_mse'][mc_run][qq].mean())
+        tn_var_temp.append(mdic['TN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
         nn_mse_temp.append(mdic['NN_mse'][mc_run][qq].mean())
+        nn_var_temp.append(mdic['NN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
         for jj in range(len(Np_c)):
             cn_mse_temp[jj].append(mdic['CN_mse'][mc_run][qq][:,jj].mean())
         tn_time_temp.append(mdic['TN_time'][mc_run][qq].mean())
         if Nzs[qq] <= dn_max:
             dn_mse_temp.append(mdic['DN_mse'][mc_run][qq].mean())
+            dn_var_temp.append(mdic['DN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
             dn_time_temp.append(mdic['DN_time'][mc_run][qq].mean())
         if qq == 5:
             tn_mse_temp_o.append(mdic['TN_mse'][mc_run][qq].mean(1))
@@ -371,10 +387,15 @@ for qq in range(len(mdic['TN_mse'][0])):
     for jj in range(len(Np_c)):
         cn_mse_over_n[jj].append(np.mean(cn_mse_temp[jj]))
     nn_mse_over_n.append(np.mean(nn_mse_temp))
+    nn_var_over_n.append(np.mean(nn_var_temp))
     tn_time_over_n.append(np.mean(tn_time_temp))
+    tn_var_over_n.append(np.mean(tn_var_temp))
     if Nzs[qq] <= dn_max:
         dn_mse_over_n.append(np.mean(dn_mse_temp))
+        dn_var_over_n.append(np.mean(dn_var_temp))
         dn_time_over_n.append(np.mean(dn_time_temp))
+        
+plt.plot(nn_var_over_n)
     
 plt.subplot(1,2,1)
 plt.plot(Nzs,tn_mse_over_n, c = 'blue', linewidth=1)
@@ -425,10 +446,13 @@ plt.show()
 # ---- save to matlab ---- #
 scipy.io.savemat('data.mat', mdict={'Nzs': Nzs,
                                     'tn_mse_over_n': tn_mse_over_n,
+                                    'tn_var_over_n': tn_var_over_n,
                                     'nn_mse_over_n': nn_mse_over_n,
+                                    'nn_var_over_n': nn_var_over_n,
                                     'Np_c': Np_c,
                                     'cn_mse_over_n': cn_mse_over_n,
                                     'dn_mse_over_n': dn_mse_over_n,
+                                    'dn_var_over_n': dn_var_over_n,
                                     'tn_time_over_n': tn_time_over_n,
                                     'dn_time_over_n': dn_time_over_n,
                                     'tn_mse_temp_o': tn_mse_temp_o,
