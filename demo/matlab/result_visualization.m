@@ -1,5 +1,5 @@
 %% ---- Monte carlo performanced visualization ---- %%
-load('data/data_stat.mat')
+load('data/data.mat')
 % ---- fig1 ---- %
 figure(1);
 hold on;
@@ -41,7 +41,7 @@ plot(t, dn_mse_temp_o(t),'color','red','LineWidth',1.1);
 for ii = 1:size(cn_mse_over_n,1)
     plot(t, cn_mse_temp_o(ii,t),'color','black','LineWidth',ii*0.35);
 end
-xlim([1,99]);
+xlim([1,30]);
 ylim([0,3]);
 xlabel('k');
 ylabel('MSE');
