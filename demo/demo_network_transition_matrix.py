@@ -34,7 +34,7 @@ TN_var = []
 DN_var = []
 
 # ---- parameters ---- #
-Nz = 40
+Nz = 10
 Q = np.diag([0.02,0.02,0.003])
 dt = 0.5 
 Ns = 50
@@ -42,23 +42,23 @@ P0 = np.diag([0.5,0.5,0.01])
 v = 1
 X0 = np.array([0,0,0])
 Np = 200
-Np_c = [200, 500, 5000]
 sigma = 0.01
 omega = 0.4
 n_components = 2
-fusion_rate = 5
+fusion_rate = 2
 n_workers = 10
 plot_flag = True
-R = []
-poses = np.zeros((Nz, 2))
-lambda2 = np.arange(0.1,0.9,0.1)
-for ii in range(Nz):
-    R.append(np.diag([np.random.uniform(0.1, 0.9),np.random.uniform(0.001, 0.1)]))
-    poses[ii,:] = np.random.uniform(-10, 10,2)
+
     
                 
                 
 for mc_run in range(mc_runs):
+    R = []
+    poses = np.zeros((Nz, 2))
+    lambda2 = np.arange(0.01,0.99,0.1)
+    for ii in range(Nz):
+        R.append(np.diag([np.random.uniform(0.4, 0.5),np.random.uniform(0.01, 0.05)]))
+        poses[ii,:] = np.random.uniform(-1, 1,2)
     TN_mse.append([])
     DN_mse.append([])
     
@@ -222,3 +222,10 @@ mdic = {"TN_mse": TN_mse,
 
 # ---- save to matlab ---- #
 scipy.io.savemat('data.mat', mdict=mdic)
+
+# ---- plot ---- #
+plt.plot(np.array(TN_var).mean((0,2)))
+plt.plot(np.array(DN_var).mean((0,2)))
+
+
+
