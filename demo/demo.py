@@ -321,7 +321,7 @@ mdic = {"TN_mse": TN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
 pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
-mdic = pickle.load( open( "data/data.p", "rb" ) )
+mdic = pickle.load( open( "data/data_uniform.p", "rb" ) )
 
 
 tn_mse_over_n = []
@@ -365,16 +365,16 @@ for qq in range(len(mdic['TN_mse'][0])):
     for mc_run in range(len(mdic['TN_mse'])-1):
         if mdic['CN_mse'][mc_run][qq][:,0].mean() > mdic['NN_mse'][mc_run][qq].mean():
             continue
-        tn_mse_temp.append(mdic['TN_mse'][mc_run][qq].mean())
-        tn_var_temp.append(mdic['TN_var'][mc_run][qq].mean())
-        nn_mse_temp.append(mdic['NN_mse'][mc_run][qq].mean())
-        nn_var_temp.append(mdic['NN_var'][mc_run][qq].mean())
+        tn_mse_temp.append(mdic['TN_mse'][mc_run][qq][:30,:].mean())
+        #tn_var_temp.append(mdic['TN_var'][mc_run][qq].mean())
+        nn_mse_temp.append(mdic['NN_mse'][mc_run][qq][:30,:].mean())
+        #nn_var_temp.append(mdic['NN_var'][mc_run][qq].mean())
         for jj in range(len(Np_c)):
             cn_mse_temp[jj].append(mdic['CN_mse'][mc_run][qq][:,jj].mean())
         tn_time_temp.append(mdic['TN_time'][mc_run][qq].mean())
         if Nzs[qq] <= dn_max:
-            dn_mse_temp.append(mdic['DN_mse'][mc_run][qq].mean())
-            dn_var_temp.append(mdic['DN_var'][mc_run][qq].mean())
+            dn_mse_temp.append(mdic['DN_mse'][mc_run][qq][:30,:].mean())
+            #dn_var_temp.append(mdic['DN_var'][mc_run][qq].mean())
             dn_time_temp.append(mdic['DN_time'][mc_run][qq].mean())
         if qq == 5:
             tn_mse_temp_o.append(mdic['TN_mse'][mc_run][qq].mean(1))
@@ -387,12 +387,12 @@ for qq in range(len(mdic['TN_mse'][0])):
     for jj in range(len(Np_c)):
         cn_mse_over_n[jj].append(np.mean(cn_mse_temp[jj]))
     nn_mse_over_n.append(np.mean(nn_mse_temp))
-    nn_var_over_n.append(np.mean(nn_var_temp))
+    #nn_var_over_n.append(np.mean(nn_var_temp))
     tn_time_over_n.append(np.mean(tn_time_temp))
-    tn_var_over_n.append(np.mean(tn_var_temp))
+    #tn_var_over_n.append(np.mean(tn_var_temp))
     if Nzs[qq] <= dn_max:
         dn_mse_over_n.append(np.mean(dn_mse_temp))
-        dn_var_over_n.append(np.mean(dn_var_temp))
+        #dn_var_over_n.append(np.mean(dn_var_temp))
         dn_time_over_n.append(np.mean(dn_time_temp))
         
     
@@ -407,6 +407,13 @@ plt.ylabel('MSE')
 #plt.xscale('log')
 plt.yscale('log')
 plt.xlim(Nzs[0], 300)
+
+scipy.io.savemat('mse_nodes.mat', mdict={'Nzs': Nzs,
+                                    'tn_mse_over_n': tn_mse_over_n,
+                                    'nn_mse_over_n': nn_mse_over_n,
+                                    'Np_c': Np_c,
+                                    'cn_mse_over_n': cn_mse_over_n,
+                                    'dn_mse_over_n': dn_mse_over_n})
 
 plt.subplot(1,2,2)
 plt.plot(Nzs,tn_time_over_n, c = 'blue', linewidth=1)
