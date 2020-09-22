@@ -10,8 +10,9 @@ import pickle
 import scipy.io
 # ---- Repeat over nomber of agents ---- #
 Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 250, 300, 350,400,450,500,550,600]
+Nzs = [40]
 dn_max = 100
-mc_runs = 100
+mc_runs = 1000
 # ---- Initialize empty array for statistics ---- #
 TN_mse = []
 DN_mse = []
@@ -47,12 +48,13 @@ for mc_run in range(mc_runs):
         Nz = Nzs[iteration]
         Q = np.diag([0.02,0.02,0.003])
         dt = 0.5 
-        Ns = 50
+        Ns = 30
         P0 = np.diag([0.5,0.5,0.01])
         v = 1
         X0 = np.array([0,0,0])
         Np = 200
         Np_c = [200, 500, 5000]
+        Np_c = [5000]
         sigma = 0.01
         omega = 0.4
         
@@ -66,8 +68,9 @@ for mc_run in range(mc_runs):
         A = np.ones((Nz,Nz))
         A = A / A.sum(axis = 1)[:,None]
         n_components = 2
-        fusion_rate = 5
-        n_workers = 10
+        fusion_rate_tn = 1
+        fusion_rate_dn = 3
+        n_workers = 20
         plot_flag = True
         
         # ---- Initialize simulator ---- #
@@ -219,16 +222,14 @@ for mc_run in range(mc_runs):
             if Nz <= dn_max:
                dn_var[t] = np.trace(np.cov(dn_x[t,:,0:2].T))
             # ---- Fusion every 'fusion_rate' time steps ---- #    
-            if t % fusion_rate == 0:
-                #tn.get_fusion_params(tn_pfs, z)
-                #dn.get_fusion_params(tn_pfs, z)
-                #A = sensors_pose2fusion_mat(poses, 3, target_pose)
+            if t % fusion_rate_tn == 0:
                 tn_pfs, calc_time_tn = tn.fuse_particle_filters(tn_pfs, n_workers=n_workers)
-                if Nz <= dn_max:
-                    dn_pfs, calc_time_dn = dn.fuse_particle_filters(dn_pfs, n_workers=n_workers)
-            tn_time[t] = calc_time_tn  
-            if Nz <= dn_max:
-                dn_time[t] = calc_time_dn  
+                tn_time[t] = calc_time_tn 
+            if t % fusion_rate_dn == 0 and Nz <= dn_max:
+                dn_pfs, calc_time_dn = dn.fuse_particle_filters(dn_pfs, n_workers=n_workers)
+                dn_time[t] = calc_time_dn 
+             
+                 
             print("==========")
             print("Nz: "+str(Nz) + "mc_run: "+str(mc_run))
             print("Step:"+str(t)+" , TN time:"+str(calc_time_tn))
