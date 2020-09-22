@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import pickle
 import scipy.io
 # ---- Repeat over nomber of agents ---- #
-Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 300, 400, 500,600,700,800,900,1000]
+Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 250, 300, 350,400,450,500,550,600]
 dn_max = 100
 mc_runs = 100
 # ---- Initialize empty array for statistics ---- #
@@ -47,7 +47,7 @@ for mc_run in range(mc_runs):
         Nz = Nzs[iteration]
         Q = np.diag([0.02,0.02,0.003])
         dt = 0.5 
-        Ns = 30
+        Ns = 50
         P0 = np.diag([0.5,0.5,0.01])
         v = 1
         X0 = np.array([0,0,0])
@@ -65,9 +65,9 @@ for mc_run in range(mc_runs):
         # A = A / A.sum(axis = 1)[:,None]
         A = np.ones((Nz,Nz))
         A = A / A.sum(axis = 1)[:,None]
-        n_components = 5
-        fusion_rate = 3
-        n_workers = 16
+        n_components = 2
+        fusion_rate = 5
+        n_workers = 10
         plot_flag = True
         
         # ---- Initialize simulator ---- #
@@ -321,7 +321,7 @@ mdic = {"TN_mse": TN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
 pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
-mdic = pickle.load( open( "data/data_uniform.p", "rb" ) )
+mdic = pickle.load( open( "data/data.p", "rb" ) )
 
 
 tn_mse_over_n = []
@@ -366,15 +366,15 @@ for qq in range(len(mdic['TN_mse'][0])):
         if mdic['CN_mse'][mc_run][qq][:,0].mean() > mdic['NN_mse'][mc_run][qq].mean():
             continue
         tn_mse_temp.append(mdic['TN_mse'][mc_run][qq].mean())
-        tn_var_temp.append(mdic['TN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
+        tn_var_temp.append(mdic['TN_var'][mc_run][qq].mean())
         nn_mse_temp.append(mdic['NN_mse'][mc_run][qq].mean())
-        nn_var_temp.append(mdic['NN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
+        nn_var_temp.append(mdic['NN_var'][mc_run][qq].mean())
         for jj in range(len(Np_c)):
             cn_mse_temp[jj].append(mdic['CN_mse'][mc_run][qq][:,jj].mean())
         tn_time_temp.append(mdic['TN_time'][mc_run][qq].mean())
         if Nzs[qq] <= dn_max:
             dn_mse_temp.append(mdic['DN_mse'][mc_run][qq].mean())
-            dn_var_temp.append(mdic['DN_mse'][mc_run][qq].var(axis = 1)[:30].mean())
+            dn_var_temp.append(mdic['DN_var'][mc_run][qq].mean())
             dn_time_temp.append(mdic['DN_time'][mc_run][qq].mean())
         if qq == 5:
             tn_mse_temp_o.append(mdic['TN_mse'][mc_run][qq].mean(1))
@@ -395,7 +395,6 @@ for qq in range(len(mdic['TN_mse'][0])):
         dn_var_over_n.append(np.mean(dn_var_temp))
         dn_time_over_n.append(np.mean(dn_time_temp))
         
-plt.plot(nn_var_over_n)
     
 plt.subplot(1,2,1)
 plt.plot(Nzs,tn_mse_over_n, c = 'blue', linewidth=1)
