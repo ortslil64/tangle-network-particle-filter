@@ -4,15 +4,29 @@ load('data/data.mat')
 figure(1);
 hold on;
 plot(Nzs(1:10), nn_mse_over_n(1:10),'color','green','LineWidth',1.1);
-plot(Nzs(1:10), nn_mse_over_n(1:10) + sqrt(nn_var_over_n(1:10)),'--','color','green','LineWidth',0.8);
+%plot(Nzs(1:10), nn_mse_over_n(1:10) + sqrt(nn_var_over_n(1:10)),'--','color','green','LineWidth',0.8);
 
 plot(Nzs(1:10), tn_mse_over_n(1:10),'color','blue','LineWidth',1.1);
-plot(Nzs(1:10), tn_mse_over_n(1:10) + sqrt(tn_var_over_n(1:10)),'--','color','blue','LineWidth',0.8);
+%plot(Nzs(1:10), tn_mse_over_n(1:10) + sqrt(tn_var_over_n(1:10)),'--','color','blue','LineWidth',0.8);
+plot(Nzs(1:6), dn_mse_over_n(1:6),'color','red', 'LineWidth',1.1);
+%plot(Nzs(1:6), dn_mse_over_n(1:6) + sqrt(dn_var_over_n(1:6)),'--','color','red','LineWidth',0.8);
+xlim([5,300]);
+ylim([0.55,1.3]);
+xlabel('nodes');
+ylabel('MSE');
+set(gca,'Yscale','log')
+set(gcf,'Position',[0 0 1000 800])
+
+
+figure(2);
+hold on;
+%plot(Nzs(1:10), nn_mse_over_n(1:10) + sqrt(nn_var_over_n(1:10)),'--','color','green','LineWidth',0.8);
+
+%plot(Nzs(1:10), tn_mse_over_n(1:10) + sqrt(tn_var_over_n(1:10)),'--','color','blue','LineWidth',0.8);
 for ii = 1:size(cn_mse_over_n,1)
     plot(Nzs(1:10), cn_mse_over_n(ii,1:10),'color','black','LineWidth',ii*0.35);
 end
-plot(Nzs(1:6), dn_mse_over_n(1:6),'color','red', 'LineWidth',1.1);
-plot(Nzs(1:6), dn_mse_over_n(1:6) + sqrt(dn_var_over_n(1:6)),'--','color','red','LineWidth',0.8);
+%plot(Nzs(1:6), dn_mse_over_n(1:6) + sqrt(dn_var_over_n(1:6)),'--','color','red','LineWidth',0.8);
 xlim([5,300]);
 xlabel('nodes');
 ylabel('MSE');
@@ -20,16 +34,16 @@ set(gca,'Yscale','log')
 set(gcf,'Position',[0 0 1000 800])
 
 % ---- fig2 ---- %
-figure(2);
-hold on;
-plot(Nzs(1:17),  sqrt(nn_var_over_n(1:17)),'color','green','LineWidth',1.1);
-plot(Nzs(1:17),  sqrt(tn_var_over_n(1:17)),'color','blue','LineWidth',1.1);
-plot(Nzs(1:7),  sqrt(dn_var_over_n(1:7)),'color','red','LineWidth',1.1);
-xlim([5,800]);
-ylim([0.0,20]);
-set(gcf,'Position',[0 0 1000 800])
-xlabel('nodes');
-ylabel('Var');
+% figure(3);
+% hold on;
+% plot(Nzs(1:17),  sqrt(nn_var_over_n(1:17)),'color','green','LineWidth',1.1);
+% plot(Nzs(1:17),  sqrt(tn_var_over_n(1:17)),'color','blue','LineWidth',1.1);
+% plot(Nzs(1:7),  sqrt(dn_var_over_n(1:7)),'color','red','LineWidth',1.1);
+% xlim([5,800]);
+% ylim([0.0,20]);
+% set(gcf,'Position',[0 0 1000 800])
+% xlabel('nodes');
+% ylabel('Var');
 
 % ---- fig3 ---- %
 figure(3);

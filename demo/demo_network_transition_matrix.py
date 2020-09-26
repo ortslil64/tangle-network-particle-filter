@@ -34,7 +34,7 @@ TN_var = []
 DN_var = []
 
 # ---- parameters ---- #
-Nz = 10
+Nz = 5
 Q = np.diag([0.02,0.02,0.003])
 dt = 0.5 
 Ns = 50
@@ -45,7 +45,9 @@ Np = 200
 sigma = 0.01
 omega = 0.4
 n_components = 2
-fusion_rate = 2
+fusion_rate_tn = 1
+fusion_rate_dn = 2
+
 n_workers = 10
 plot_flag = True
 
@@ -55,7 +57,7 @@ plot_flag = True
 for mc_run in range(mc_runs):
     R = []
     poses = np.zeros((Nz, 2))
-    lambda2 = np.arange(0.01,0.99,0.1)
+    lambda2 = np.arange(0.01,0.6,0.1)
     for ii in range(Nz):
         R.append(np.diag([np.random.uniform(0.4, 0.5),np.random.uniform(0.01, 0.05)]))
         poses[ii,:] = np.random.uniform(-1, 1,2)
@@ -169,9 +171,9 @@ for mc_run in range(mc_runs):
             tn_var[t] = np.trace(np.cov(tn_x[t,:,0:2].T))
             dn_var[t] = np.trace(np.cov(dn_x[t,:,0:2].T))
             # ---- Fusion every 'fusion_rate' time steps ---- #    
-            if t % fusion_rate == 0:
-
+            if t % fusion_rate_tn == 0:
                 tn_pfs, calc_time_tn = tn.fuse_particle_filters(tn_pfs, n_workers=n_workers)
+            if t % fusion_rate_dn == 0:
                 dn_pfs, calc_time_dn = dn.fuse_particle_filters(dn_pfs, n_workers=n_workers)
 
             print("==========")
@@ -201,8 +203,8 @@ for mc_run in range(mc_runs):
             
             plt.subplot(1,3,3)
             
-            plt.plot(np.array(TN_var[0]).mean(1), c = 'blue', linewidth=1)
-            plt.plot(np.array(DN_var[0]).mean(1), c = 'red', linewidth=1)
+            plt.plot(np.array(TN_var[0])[:,:-10].mean(1), c = 'blue', linewidth=1)
+            plt.plot(np.array(DN_var[0])[:,:-10].mean(1), c = 'red', linewidth=1)
             plt.xlabel('nodes')
             plt.ylabel('Var')
     
@@ -224,8 +226,17 @@ mdic = {"TN_mse": TN_mse,
 scipy.io.savemat('data.mat', mdict=mdic)
 
 # ---- plot ---- #
-plt.plot(np.array(TN_var).mean((0,2)))
-plt.plot(np.array(DN_var).mean((0,2)))
+plt.plot(np.flip(1-lambda2), np.array(TN_var[:-1])[:,:,:-10].mean((0,2)))
+plt.plot(np.flip(1-lambda2), np.array(DN_var[:-1])[:,:,:-10].mean((0,2)))
+#plt.xscale('log')
+#plt.yscale('log')
+plt.show()
 
+
+plt.plot(np.array(TN_mse[:-1]).mean((0,2,3)))
+plt.plot(np.array(DN_mse[:-1]).mean((0,2,3)))
+#plt.xscale('log')
+plt.yscale('log')
+plt.show()
 
 

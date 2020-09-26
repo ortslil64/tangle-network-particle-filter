@@ -10,8 +10,9 @@ import pickle
 import scipy.io
 # ---- Repeat over nomber of agents ---- #
 Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 250, 300, 350,400,450,500,550,600]
+Nzs = [40]
 dn_max = 100
-mc_runs = 100
+mc_runs = 1000
 # ---- Initialize empty array for statistics ---- #
 TN_mse = []
 DN_mse = []
@@ -47,12 +48,13 @@ for mc_run in range(mc_runs):
         Nz = Nzs[iteration]
         Q = np.diag([0.02,0.02,0.003])
         dt = 0.5 
-        Ns = 50
+        Ns = 30
         P0 = np.diag([0.5,0.5,0.01])
         v = 1
         X0 = np.array([0,0,0])
         Np = 200
         Np_c = [200, 500, 5000]
+        Np_c = [5000]
         sigma = 0.01
         omega = 0.4
         
@@ -66,8 +68,9 @@ for mc_run in range(mc_runs):
         A = np.ones((Nz,Nz))
         A = A / A.sum(axis = 1)[:,None]
         n_components = 2
-        fusion_rate = 5
-        n_workers = 10
+        fusion_rate_tn = 1
+        fusion_rate_dn = 3
+        n_workers = 20
         plot_flag = True
         
         # ---- Initialize simulator ---- #
@@ -219,16 +222,14 @@ for mc_run in range(mc_runs):
             if Nz <= dn_max:
                dn_var[t] = np.trace(np.cov(dn_x[t,:,0:2].T))
             # ---- Fusion every 'fusion_rate' time steps ---- #    
-            if t % fusion_rate == 0:
-                #tn.get_fusion_params(tn_pfs, z)
-                #dn.get_fusion_params(tn_pfs, z)
-                #A = sensors_pose2fusion_mat(poses, 3, target_pose)
+            if t % fusion_rate_tn == 0:
                 tn_pfs, calc_time_tn = tn.fuse_particle_filters(tn_pfs, n_workers=n_workers)
-                if Nz <= dn_max:
-                    dn_pfs, calc_time_dn = dn.fuse_particle_filters(dn_pfs, n_workers=n_workers)
-            tn_time[t] = calc_time_tn  
-            if Nz <= dn_max:
-                dn_time[t] = calc_time_dn  
+                tn_time[t] = calc_time_tn 
+            if t % fusion_rate_dn == 0 and Nz <= dn_max:
+                dn_pfs, calc_time_dn = dn.fuse_particle_filters(dn_pfs, n_workers=n_workers)
+                dn_time[t] = calc_time_dn 
+             
+                 
             print("==========")
             print("Nz: "+str(Nz) + "mc_run: "+str(mc_run))
             print("Step:"+str(t)+" , TN time:"+str(calc_time_tn))
@@ -321,7 +322,7 @@ mdic = {"TN_mse": TN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
 pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
-mdic = pickle.load( open( "data/data.p", "rb" ) )
+mdic = pickle.load( open( "data/data_uniform.p", "rb" ) )
 
 
 tn_mse_over_n = []
@@ -365,16 +366,16 @@ for qq in range(len(mdic['TN_mse'][0])):
     for mc_run in range(len(mdic['TN_mse'])-1):
         if mdic['CN_mse'][mc_run][qq][:,0].mean() > mdic['NN_mse'][mc_run][qq].mean():
             continue
-        tn_mse_temp.append(mdic['TN_mse'][mc_run][qq].mean())
-        tn_var_temp.append(mdic['TN_var'][mc_run][qq].mean())
-        nn_mse_temp.append(mdic['NN_mse'][mc_run][qq].mean())
-        nn_var_temp.append(mdic['NN_var'][mc_run][qq].mean())
+        tn_mse_temp.append(mdic['TN_mse'][mc_run][qq][:30,:].mean())
+        #tn_var_temp.append(mdic['TN_var'][mc_run][qq].mean())
+        nn_mse_temp.append(mdic['NN_mse'][mc_run][qq][:30,:].mean())
+        #nn_var_temp.append(mdic['NN_var'][mc_run][qq].mean())
         for jj in range(len(Np_c)):
             cn_mse_temp[jj].append(mdic['CN_mse'][mc_run][qq][:,jj].mean())
         tn_time_temp.append(mdic['TN_time'][mc_run][qq].mean())
         if Nzs[qq] <= dn_max:
-            dn_mse_temp.append(mdic['DN_mse'][mc_run][qq].mean())
-            dn_var_temp.append(mdic['DN_var'][mc_run][qq].mean())
+            dn_mse_temp.append(mdic['DN_mse'][mc_run][qq][:30,:].mean())
+            #dn_var_temp.append(mdic['DN_var'][mc_run][qq].mean())
             dn_time_temp.append(mdic['DN_time'][mc_run][qq].mean())
         if qq == 5:
             tn_mse_temp_o.append(mdic['TN_mse'][mc_run][qq].mean(1))
@@ -387,12 +388,12 @@ for qq in range(len(mdic['TN_mse'][0])):
     for jj in range(len(Np_c)):
         cn_mse_over_n[jj].append(np.mean(cn_mse_temp[jj]))
     nn_mse_over_n.append(np.mean(nn_mse_temp))
-    nn_var_over_n.append(np.mean(nn_var_temp))
+    #nn_var_over_n.append(np.mean(nn_var_temp))
     tn_time_over_n.append(np.mean(tn_time_temp))
-    tn_var_over_n.append(np.mean(tn_var_temp))
+    #tn_var_over_n.append(np.mean(tn_var_temp))
     if Nzs[qq] <= dn_max:
         dn_mse_over_n.append(np.mean(dn_mse_temp))
-        dn_var_over_n.append(np.mean(dn_var_temp))
+        #dn_var_over_n.append(np.mean(dn_var_temp))
         dn_time_over_n.append(np.mean(dn_time_temp))
         
     
@@ -407,6 +408,13 @@ plt.ylabel('MSE')
 #plt.xscale('log')
 plt.yscale('log')
 plt.xlim(Nzs[0], 300)
+
+scipy.io.savemat('mse_nodes.mat', mdict={'Nzs': Nzs,
+                                    'tn_mse_over_n': tn_mse_over_n,
+                                    'nn_mse_over_n': nn_mse_over_n,
+                                    'Np_c': Np_c,
+                                    'cn_mse_over_n': cn_mse_over_n,
+                                    'dn_mse_over_n': dn_mse_over_n})
 
 plt.subplot(1,2,2)
 plt.plot(Nzs,tn_time_over_n, c = 'blue', linewidth=1)
