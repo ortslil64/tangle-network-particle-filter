@@ -39,4 +39,4 @@ TO DO
 ## References
 [1] Distributed Information Fusion in Tangle Networks (Under review, Automatica)
 
-[2]]  [J.  Li  and  A.  Nehorai.   Distributed  particle  filtering  via  optimal  fusionof  gaussian  mixtures.IEEE  Transactions  on  Signal  and  InformationProcessing over Networks,  4(2):280–292,  2018.](https://ieeexplore.ieee.org/document/7266692)
+[2] [J.  Li  and  A.  Nehorai.   Distributed  particle  filtering  via  optimal  fusionof  gaussian  mixtures.IEEE  Transactions  on  Signal  and  InformationProcessing over Networks,  4(2):280–292,  2018.](https://ieeexplore.ieee.org/document/7266692)
