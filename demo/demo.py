@@ -9,10 +9,9 @@ import matplotlib.pyplot as plt
 import pickle
 import scipy.io
 # ---- Repeat over nomber of agents ---- #
-Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 250, 300, 350,400,450,500,550,600]
-Nzs = [40]
+Nzs = [5, 10, 20, 40, 60, 80, 100, 150, 200, 250, 300]
 dn_max = 100
-mc_runs = 1000
+mc_runs = 100
 # ---- Initialize empty array for statistics ---- #
 TN_mse = []
 DN_mse = []
@@ -29,9 +28,9 @@ poses = np.zeros((Nzs[-1], 2))
 for ii in range(Nzs[-1]):
     R.append(np.diag([np.random.uniform(0.1, 0.9),np.random.uniform(0.001, 0.1)]))
     poses[ii,:] = np.random.uniform(-10, 10,2)
-    
-                
-                
+
+
+        
 for mc_run in range(mc_runs):
     TN_mse.append([])
     DN_mse.append([])
@@ -58,15 +57,16 @@ for mc_run in range(mc_runs):
         sigma = 0.01
         omega = 0.4
         
-        # A = np.eye(Nz)
-        # for ii in range(Nz):
-        #     R.append(np.diag([np.random.uniform(0.01, 0.9),np.random.uniform(0.001, 0.2)]))
-        #     poses[ii,:] = np.random.uniform(-10, 10,2)
-        #     for jj in range(Nz):
-        #         A[ii,jj] = ((ii+1)/(jj+1))
-        # A = A / A.sum(axis = 1)[:,None]
-        A = np.ones((Nz,Nz))
+        A = np.eye(Nz)
+        for ii in range(Nz):
+            for jj in range(Nz):   
+                if ii == jj:
+                    A[ii,jj] = 1/Nz
+                else:             
+                    A[ii,jj] = 1/np.linalg.norm(poses[ii] - poses[jj])**2
         A = A / A.sum(axis = 1)[:,None]
+        # A = np.ones((Nz,Nz))
+        # A = A / A.sum(axis = 1)[:,None]
         n_components = 2
         fusion_rate_tn = 1
         fusion_rate_dn = 3
@@ -321,8 +321,14 @@ mdic = {"TN_mse": TN_mse,
         "CN_mse": CN_mse,
         "TN_time": TN_time,
         "DN_time": DN_time} 
-pickle.dump( mdic, open( "data/data.p", "wb" ) ) 
+pickle.dump( mdic, open( "data1000.p", "wb" ) ) 
+scipy.io.savemat('data.mat',mdic)
 mdic = pickle.load( open( "data/data_uniform.p", "rb" ) )
+
+# ---- Save network configuration data ---- #
+mdic_net = {"poses": poses, "A": A} 
+scipy.io.savemat('data_net.mat',mdic_net)
+
 
 
 tn_mse_over_n = []

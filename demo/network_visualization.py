@@ -22,7 +22,7 @@ X0 = np.array([0,0,0])
 Np = 100
 sigma = 0.01
 omega = 0.3
-Nz = Nzs[4]
+Nz = Nzs[5]
 # ---- Initialize simulator ---- #
 sim_fly = simulation_fly(Q = Q,
                              R = R[:Nz],
@@ -36,7 +36,13 @@ sim_fly = simulation_fly(Q = Q,
 for ii in range(Ns):
     sim_fly.step()
 # ---- Initialize graph ---- #
-A = np.random.rand(Nz,Nz)
+A = np.eye(Nz)
+for ii in range(Nz):
+    for jj in range(Nz):   
+        if ii == jj:
+            A[ii,jj] = 1/Nz
+        else:             
+            A[ii,jj] = 1/np.linalg.norm(poses[ii] - poses[jj])**2
 A = A / A.sum(axis = 1)[:,None]
 graph=nx.Graph()
 for ii in range(Nz):
@@ -44,22 +50,24 @@ for ii in range(Nz):
 
 for ii in range(Nz):
     for jj in range(Nz):
-        if A[ii,jj] > 1/Nz and ii != jj:
-            graph.add_edge(ii,jj, weight=20*A[ii,jj] )
+        if A[ii,jj] > 3/Nz and ii != jj:
+            graph.add_edge(ii,jj, weight=40*A[ii,jj] )
 edges = graph.edges()
 weights = [graph[u][v]['weight'] for u,v in edges]
-colors = [(100*graph[u][v]['weight']) for u,v in edges]
-colors = (np.array(colors) - min(colors))/(max(colors) - min(colors))
+colors = [(graph[u][v]['weight']) for u,v in edges]
+weights = colors
+colors = 2*(np.array(colors) - min(colors))/(max(colors) - min(colors))
 pos=nx.get_node_attributes(graph,'pos')
 fig, ax = plt.subplots(figsize=(10,10))
-nx.draw(graph,pos, node_size = 10,  edge_color=colors, edge_cmap=plt.cm.Greys, ax=ax, node_color='blue')
+nx.draw(graph,pos, node_size = 20,  edge_color='black' ,width = 1.2,  edge_cmap=plt.cm.Blues, ax=ax, node_color='blue')
 limits=plt.axis('on')
 ax.tick_params(left=True, bottom=True, labelleft=True, labelbottom=True)
-plt.plot(sim_fly.X[:,0], sim_fly.X[:,1], c='red', linewidth = 1.5)
-plt.xlabel('x', fontsize=18)
-plt.ylabel('y', fontsize=18)
+ax.tick_params(axis='x', labelsize=20)
+ax.tick_params(axis='y', labelsize=20)
+plt.plot(sim_fly.X[:,0], sim_fly.X[:,1], c='red', linewidth = 1.0)
+plt.xlabel('x', fontsize=20)
+plt.ylabel('y', fontsize=20)
 plt.show()
-
 # ---- plot connectivity ---- #
 fig, (ax1,ax2) = plt.subplots(figsize=(5,10), nrows=2)
 A = np.random.rand(Nz,Nz)

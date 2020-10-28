@@ -1,17 +1,17 @@
 %% ---- Monte carlo performanced visualization ---- %%
-load('data/data.mat')
+load('data/data_sparse.mat')
 % ---- fig1 ---- %
 figure(1);
 hold on;
-plot(Nzs(1:10), nn_mse_over_n(1:10),'color','green','LineWidth',1.1);
+plot(Nzs, nn_mse_over_n,'color','green','LineWidth',1.1);
 %plot(Nzs(1:10), nn_mse_over_n(1:10) + sqrt(nn_var_over_n(1:10)),'--','color','green','LineWidth',0.8);
 
-plot(Nzs(1:10), tn_mse_over_n(1:10),'color','blue','LineWidth',1.1);
+plot(Nzs, tn_mse_over_n,'color','blue','LineWidth',1.1);
 %plot(Nzs(1:10), tn_mse_over_n(1:10) + sqrt(tn_var_over_n(1:10)),'--','color','blue','LineWidth',0.8);
-plot(Nzs(1:6), dn_mse_over_n(1:6),'color','red', 'LineWidth',1.1);
+plot(Nzs(1:7), dn_mse_over_n(1:7),'color','red', 'LineWidth',1.1);
 %plot(Nzs(1:6), dn_mse_over_n(1:6) + sqrt(dn_var_over_n(1:6)),'--','color','red','LineWidth',0.8);
-xlim([5,300]);
-ylim([0.55,1.3]);
+% xlim([5,300]);
+% ylim([0.55,1.3]);
 xlabel('nodes');
 ylabel('MSE');
 set(gca,'Yscale','log')
@@ -106,3 +106,33 @@ ax.Position = axpos;
 
 
 set(gcf,'Position',[0 0 1000 800])
+
+%% ---- Network configuration visualization with graph---- %%
+load('data/data_net.mat')
+
+Nz = 60;
+A = A(1:Nz,1:Nz);
+for ii=1:Nz
+   A(ii,:) =  A(ii,:)/sum(A(ii,:));
+end
+figure(7);
+imagesc(A);
+axis image;
+set(gca, 'ydir', 'normal' )
+
+c = colorbar('FontSize', 8);
+ax = gca;
+axpos = ax.Position;
+cpos = c.Position;
+cpos(3) = 0.5*cpos(3);
+cpos(1) = 1.01*cpos(1);
+c.Position = cpos;
+ax.Position = axpos;
+
+
+set(gcf,'Position',[0 0 1000 800])
+
+B = zeros(Nz,Nz);
+B(find(A>2/Nz)) = 1;
+
+

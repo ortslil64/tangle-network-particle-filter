@@ -10,9 +10,6 @@ The demo implemented here is a sensor network for object positioning using range
 
 ![demo](https://github.com/ortslil64/tangle-network-particle-filter/blob/master/images/nodes.png?raw=true "Sensors positions and target trajectory")
 
-For this demo we use a random network transition matrix as follows.
-
-![demo](https://github.com/ortslil64/tangle-network-particle-filter/blob/master/images/transition_matrix.png?raw=true "visualization of the transition matrix")
 
 ## Installation
 1) Clone the repository:
