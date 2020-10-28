@@ -8,7 +8,7 @@ The package contains a fusion scheme for distributed particle filters and a demo
 ## Demo
 The demo implemented here is a sensor network for object positioning using range and bearing observations. The target stochastic model is of a sircular walk, and the estimated state is the target center of mass and orientation. An example for the target trajectory and a position of the sensor is shown in the next figure.
 
-![demo](https://github.com/ortslil64/tangle-network-particle-filter/blob/master/tangle/nodes.png?raw=true "Sensors positions and target trajectory")
+![demo](https://github.com/ortslil64/tangle-network-particle-filter/blob/tangle/images/nodes.png?raw=true "Sensors positions and target trajectory")
 
 
 ## Installation
