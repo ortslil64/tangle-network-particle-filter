@@ -37,6 +37,6 @@ python3 demo/demo.py
 TO DO
 
 ## References
-[1] Distributed Information Fusion in Tangle Networks (Under review, Automatica)
+[1] [Tslil O, Feiner T, Carmi A. Distributed information fusion in tangle networks. Automatica.;125:109417.](https://doi.org/10.1016/j.automatica.2020.109417)
 
 [2] [J.  Li  and  A.  Nehorai.   Distributed  particle  filtering  via  optimal  fusionof  gaussian  mixtures.IEEE  Transactions  on  Signal  and  InformationProcessing over Networks,  4(2):280–292,  2018.](https://ieeexplore.ieee.org/document/7266692)
