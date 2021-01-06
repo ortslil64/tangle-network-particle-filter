@@ -1,6 +1,6 @@
 # tangle-network-particle-filter
 By [Or Tslil](https://github.com/ortslil64), [Tal Feiner](https://github.com/TalFeiner) and Avishy Carmi
-This package is part of the work titled "Distributed Information Fusion in Tangle Networks", currently under review.
+This package is part of the work titled "Distributed Information Fusion in Tangle Networks".
 
 ## Algorithm
 The package contains a fusion scheme for distributed particle filters and a demo for sensor network. The fusion scheme is based on the generalization of the Covariance Intersection algorithm. The fusion algorithm is fed with a network transition matrix that contains the connectivity of the network (see `demo.py`).
